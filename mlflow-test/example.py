@@ -13,10 +13,6 @@ from sklearn.linear_model import ElasticNet
 from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score
 from sklearn.model_selection import train_test_split
 
-import dagshub
-dagshub.init(repo_owner='saishridhar', repo_name='Cancer-Detection', mlflow=True)
-
-
 
 import mlflow
 import mlflow.sklearn
@@ -60,6 +56,9 @@ if __name__ == "__main__":
     alpha = float(sys.argv[1]) if len(sys.argv) > 1 else 0.5
     l1_ratio = float(sys.argv[2]) if len(sys.argv) > 2 else 0.5
 
+    remote_server_uri = "http://ec2-18-188-232-57.us-east-2.compute.amazonaws.com:5000/"
+    mlflow.set_tracking_uri(remote_server_uri)
+
     with mlflow.start_run():
         lr = ElasticNet(alpha=alpha, l1_ratio=l1_ratio, random_state=42)
         lr.fit(train_x, train_y)
@@ -81,6 +80,9 @@ if __name__ == "__main__":
 
         predictions = lr.predict(train_x)
         signature = infer_signature(train_x, predictions)
+
+        
+
 
         tracking_url_type_store = urlparse(mlflow.get_tracking_uri()).scheme
 
